@@ -2,6 +2,7 @@ import { ErrorRequestHandler } from 'express';
 import config from '../config';
 import AppError from '../errors/AppError';
 import mongoose from 'mongoose';
+import { ZodError } from 'zod';
 
 
 // Define error source type
@@ -34,15 +35,15 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
       message: err.message
     }];
   }
-//   else if (err instanceof ZodError) {
-//     // Handle Zod validation errors
-//     statusCode = 400;
-//     message = 'Validation error';
-//     errorSources = err.errors.map(error => ({
-//       path: error.path.join('.'),
-//       message: error.message
-//     }));
-//   }
+  else if (err instanceof ZodError) {
+    // Handle Zod validation errors
+    statusCode = 400;
+    message = 'Validation error';
+    errorSources = err.issues.map(error => ({
+      path: error.path.join('.'),
+      message: error.message
+    }));
+  }
   else if (err instanceof mongoose.Error.ValidationError) {
     // Handle Mongoose validation errors
     statusCode = 400;
