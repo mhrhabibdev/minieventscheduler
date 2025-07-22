@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
+import { categorizeEvent } from "@/shared/utils/categorizeEvent"; // add this import
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +31,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 
 // Schema and Type
 const formSchema = z.object({
@@ -37,7 +44,7 @@ const formSchema = z.object({
   notes: z.string().optional(),
   date: z.string().min(1, { message: "Please select a date" }),
   time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
-    message: "Please enter a valid time in HH:MM format",
+  message: "Please enter a valid time in HH:MM format",
   }),
   category: z.enum(["Work", "Personal", "Other"]),
 });
@@ -45,7 +52,9 @@ const formSchema = z.object({
 export type EventFormData = z.infer<typeof formSchema>;
 
 interface AddEventDialogProps {
-  onAddEvent: (data: EventFormData & { archived: boolean }) => Promise<void> | void;
+  onAddEvent: (
+    data: EventFormData & { archived: boolean }
+  ) => Promise<void> | void;
 }
 
 export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
@@ -58,17 +67,31 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
       title: "",
       notes: "",
       time: "",
-      category: "Work",
+      category: "Other", // default Other for safety
       date: "",
     },
   });
+  const watchedTitle = form.watch("title");
+  const watchedNotes = form.watch("notes");
+  // Auto-update category when title or notes change
+  useEffect(() => {
+    const autoCategory = categorizeEvent(
+      watchedTitle || "",
+      watchedNotes || ""
+    );
+    form.setValue("category", autoCategory as "Work" | "Personal" | "Other", {
+      shouldValidate: false,
+      shouldDirty: false,
+      shouldTouch: false,
+    });
+  }, [watchedTitle, watchedNotes, form]);
 
   async function onSubmit(values: EventFormData) {
     try {
       setIsSubmitting(true);
       await onAddEvent({
         ...values,
-        archived: false,  // ডিফল্ট archived=false
+        archived: false, // ডিফল্ট archived=false
       });
       setOpen(false);
       form.reset();
@@ -111,7 +134,11 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
                   <FormItem>
                     <FormLabel>Title*</FormLabel>
                     <FormControl>
-                      <Input placeholder="Event title" {...field} disabled={isSubmitting} />
+                      <Input
+                        placeholder="Event title"
+                        {...field}
+                        disabled={isSubmitting}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -125,7 +152,11 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
                   <FormItem>
                     <FormLabel>Notes</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Enter notes..." {...field} disabled={isSubmitting} />
+                      <Textarea
+                        placeholder="Enter notes..."
+                        {...field}
+                        disabled={isSubmitting}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,14 +178,20 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
                               className="pl-3 text-left font-normal"
                               disabled={isSubmitting}
                             >
-                              {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={field.value ? new Date(field.value) : undefined}
+                            selected={
+                              field.value ? new Date(field.value) : undefined
+                            }
                             onSelect={(date) => {
                               if (date) {
                                 field.onChange(date.toISOString());
@@ -170,31 +207,61 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
                   )}
                 />
 
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="time"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Time*</FormLabel>
                       <FormControl>
-                        <Input placeholder="HH:MM" {...field} disabled={isSubmitting} />
+                        <Input
+                          placeholder="HH:MM"
+                          {...field}
+                          disabled={isSubmitting}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
+                <FormField
+  control={form.control}
+  name="time"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Time*</FormLabel>
+      <FormControl>
+        <Input
+          type="time"
+          {...field}
+          disabled={isSubmitting}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+ 
+
+
+                
               </div>
 
+              {/* এখানে category select disabled রাখা হয়েছে, কারণ auto set হবে */}
               <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      disabled
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
                       <FormControl>
-                        <SelectTrigger disabled={isSubmitting}>
-                          <SelectValue placeholder="Select category" />
+                        <SelectTrigger disabled>
+                          <SelectValue placeholder="Auto category" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

@@ -36,21 +36,24 @@ export const EventTable = ({
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-md border border-border bg-background">
         <Table>
-          <TableHeader className="bg-gray-50 dark:bg-gray-800">
+          <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead className="w-[30%]">Title</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Time</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-[30%] text-foreground">Title</TableHead>
+              <TableHead className="text-foreground">Date</TableHead>
+              <TableHead className="text-foreground">Time</TableHead>
+              <TableHead className="text-foreground">Category</TableHead>
+              <TableHead className="text-right text-foreground">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {events.length === 0 ? (
+            {!events || events.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center h-24 text-muted-foreground"
+                >
                   No events found.
                 </TableCell>
               </TableRow>
@@ -63,16 +66,21 @@ export const EventTable = ({
                     : null;
 
                 return (
-                  <TableRow key={event._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <TableCell className="font-medium">{event.title}</TableCell>
-                    <TableCell>
+                  <TableRow
+                    key={event._id}
+                    className="hover:bg-muted/50 transition-colors"
+                  >
+                    <TableCell className="font-medium text-foreground">
+                      {event.title}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
                       {eventDate ? format(eventDate, "PPP") : "N/A"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-muted-foreground">
                       {eventTime ? format(eventTime, "h:mm a") : "All day"}
                     </TableCell>
                     <TableCell>
-                      <span className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
+                      <span className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary capitalize">
                         {event.category}
                       </span>
                     </TableCell>
@@ -82,7 +90,7 @@ export const EventTable = ({
                           variant="outline"
                           size="sm"
                           onClick={() => onArchive(event._id)}
-                          className="gap-1 hover:bg-amber-500/10 hover:text-amber-600"
+                          className="gap-1 hover:bg-muted cursor-pointer dark:hover:bg-muted/40"
                         >
                           <Archive className="w-3 h-3" />
                           Archive
@@ -91,7 +99,7 @@ export const EventTable = ({
                         <Button
                           disabled
                           variant="outline"
-                          className="text-red-700 border-red-300"
+                          className="gap-1 text-muted-foreground cursor-not-allowed"
                         >
                           Archived
                         </Button>
@@ -100,7 +108,7 @@ export const EventTable = ({
                         variant="outline"
                         size="sm"
                         onClick={() => onDelete(event._id)}
-                        className=" gap-1 hover:bg-destructive/10 cursor-pointer  hover:text-destructive"
+                        className="gap-1 text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 cursor-pointer"
                       >
                         <Trash2 className="w-3 h-3" />
                         Delete
