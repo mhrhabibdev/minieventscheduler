@@ -108,9 +108,9 @@ http://localhost:5173
 
 ```
 
----
 ### 📁 Folder Structure
 
+```
 MINI-EVENT-SCHEDULER/
 ├── client/                        # Frontend (React + TypeScript + Vite)
 │   ├── public/                    # Static files
@@ -147,8 +147,7 @@ MINI-EVENT-SCHEDULER/
 │       ├── utils/                 # Helper utilities
 │       ├── app.ts                 # Main app entry
 │       └── server.ts              # Server bootstrap
-
----
+```
 
 ---
 ### Contact
