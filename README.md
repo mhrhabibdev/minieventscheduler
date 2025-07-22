@@ -148,6 +148,29 @@ MINI-EVENT-SCHEDULER/
 │       ├── app.ts                 # Main app entry
 │       └── server.ts              # Server bootstrap
 ```
+###  Extra Features (Beyond Project Requirements)
+
+- 🌙🔆 **Light/Dark Mode Support**
+  - Integrated using `shadcn/ui` and `next-themes`.
+  - Users can toggle between dark and light themes.
+
+- 🧭 **Responsive Navbar**
+  - Mobile-first responsive navigation bar.
+  - Automatically highlights the current active route.
+
+- 📦 **Footer Section**
+  - Includes branding and useful links.
+  - Fully responsive and matches the theme mode.
+
+- 📋 **Event Management Table**
+  - Displays all events in a well-structured table.
+  - Users can view, edit, archive/unarchive, or delete events directly.
+
+- 📄 **Pagination in Events Table**
+  - Server-side pagination implemented for better performance.
+  - Efficiently handles a large number of events without lag.
+  - Includes `Previous` and `Next` buttons along with page numbers.
+
 
 ---
 ### Contact
