@@ -15,19 +15,39 @@ export const createEvent = async (req: Request<{}, {}, IEvent>, res: Response, n
   }
 };
 
+// export const getEvents = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const events = await eventService.getEvents({});
+//     res.status(200).json({
+//       success: true,
+//       message: "Events fetched successfully",
+//       data: events
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 export const getEvents = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const events = await eventService.getEvents();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const { events, total } = await eventService.getEvents({}, page, limit);
+
     res.status(200).json({
       success: true,
       message: "Events fetched successfully",
-      data: events
+      data: {
+        events,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      }
     });
   } catch (error) {
     next(error);
   }
 };
-
 export const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id;
@@ -49,10 +69,10 @@ export const updateEvent = async (req: Request, res: Response, next: NextFunctio
 export const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await eventService.deleteEvent(req.params.id);
-    res.status(200).json({  // Changed to 200
+    res.status(200).json({  
       success: true,
       message: "Event deleted successfully",
-      data: null  // Explicit null for consistency
+      data: null  
     });
   } catch (error) {
     next(error);

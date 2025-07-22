@@ -11,10 +11,23 @@ export const createEvent = async (payload: IEvent) => {
   return event;
 };
 
-const getEvents = async (filters: { archived?: boolean } = { archived: false }) => {
-  return await Event.find(filters)
-    .sort({ date: 1, time: 1 }) // Sort by date then time
-    .lean(); 
+// const getEvents = async ({}) => {
+//   return await Event.find({})
+//     .sort({ date: 1, time: 1 }) // Sort by date then time
+//     .lean(); 
+// };
+const getEvents = async (filters = {}, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const events = await Event.find(filters)
+    .sort({ date: 1, time: 1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  const total = await Event.countDocuments(filters);
+
+  return { events, total };
 };
 export const updateEvent = async (id: string, body: Partial<IEvent>) => {
   const updatedEvent = await Event.findByIdAndUpdate(id, body, {
