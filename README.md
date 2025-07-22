@@ -4,7 +4,6 @@ A full-stack event scheduling application built with React, TypeScript, Tailwind
 
 Users can create, view, update (archive), and delete events such as meetings or reminders. Each event is automatically categorized as **Work**, **Personal**, or **Other** based on keywords in the title or notes, demonstrating simple AI/LLM-inspired integration.
 
-```markdown
 ## 🔗 Live Demo
 
 Frontend: [https://minieventfrontend.vercel.app](https://minieventfrontend.vercel.app)  
